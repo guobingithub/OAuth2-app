@@ -25,7 +25,6 @@ func main() {
 	clientStore.Set(constants.ClientId, &models.Client{
 		ID:     constants.ClientId,
 		Secret: constants.ClientSecret,
-		Domain: constants.DomainUrl,
 	})
 	manager.MapClientStorage(clientStore)
 
