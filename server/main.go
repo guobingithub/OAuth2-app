@@ -15,6 +15,7 @@ import (
 	"OAuth2-demo/constants"
 	."OAuth2-demo/oauth-flag"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -31,6 +32,8 @@ func main() {
 	srv := server.NewServer(server.NewConfig(), manager)
 
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
+	srv.SetAccessTokenExpHandler(accessTokenExpHandler)
+	srv.SetAuthorizeScopeHandler(authorizeScopeHandler)
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
 		logger.Error("Internal Error:", err.Error())
@@ -91,6 +94,16 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 	store.Delete("UserID")
 	store.Save()
 	return
+}
+
+func accessTokenExpHandler(w http.ResponseWriter, r *http.Request) (exp time.Duration, err error){
+	logger.Info(fmt.Sprintf("accessTokenExpHandler enter, Request:%v",r))
+	return 20 * time.Second, nil
+}
+
+func authorizeScopeHandler(w http.ResponseWriter, r *http.Request) (scope string, err error){
+	logger.Info(fmt.Sprintf("authorizeScopeHandler enter, Request:%v",r))
+	return "user", nil
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
