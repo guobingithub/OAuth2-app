@@ -111,7 +111,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	outputHTML(w, r, LoginPath)
+	showHTML(w, r, LoginPath)
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {
@@ -150,10 +150,10 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	outputHTML(w, r, AuthPath)
+	showHTML(w, r, AuthPath)
 }
 
-func outputHTML(w http.ResponseWriter, req *http.Request, filename string) {
+func showHTML(w http.ResponseWriter, req *http.Request, filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
