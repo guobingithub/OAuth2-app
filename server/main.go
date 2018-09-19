@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"OAuth2-demo/logger"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,9 +12,9 @@ import (
 	"gopkg.in/oauth2.v3/models"
 	"gopkg.in/oauth2.v3/server"
 	"gopkg.in/oauth2.v3/store"
-	"fmt"
 	"OAuth2-demo/constants"
 	."OAuth2-demo/oauth-flag"
+	"fmt"
 )
 
 func main() {
@@ -34,36 +34,41 @@ func main() {
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
-		log.Println("Internal Error:", err.Error())
+		logger.Error("Internal Error:", err.Error())
 		return
 	})
 
 	srv.SetResponseErrorHandler(func(re *errors.Response) {
-		log.Println("Response Error:", re.Error.Error())
+		logger.Error("Response Error:", re.Error.Error())
 	})
 
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/auth", authHandler)
 
 	http.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
+		logger.Info(fmt.Sprintf("authorize Handler enter, Request:%v",r))
 		err := srv.HandleAuthorizeRequest(w, r)
 		if err != nil {
+			logger.Error(fmt.Sprintf("authorize Handler, HandleAuthorizeRequest err:%v",err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	})
 
 	http.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		logger.Info(fmt.Sprintf("token Handler enter, Request:%v",r))
 		err := srv.HandleTokenRequest(w, r)
 		if err != nil {
+			logger.Error(fmt.Sprintf("token Handler, HandleTokenRequest err:%v",err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 
-	log.Println("Server is running at 9000 port.")
-	log.Fatal(http.ListenAndServe(":9000", nil))
+	logger.Info("Server is running at 9000 port.")
+	logger.Fatal(http.ListenAndServe(":9000", nil))
 }
 
 func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string, err error) {
+	logger.Info(fmt.Sprintf("userAuthorizeHandler enter, Request:%v",r))
 	store, err := session.Start(nil, w, r)
 	if err != nil {
 		return
@@ -75,7 +80,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 			r.ParseForm()
 		}
 		store.Set("ReturnUri", r.Form)
-		fmt.Println("userAuthorizeHandler, ReturnUri:",r.Form)
+		logger.Info("userAuthorizeHandler, ReturnUri:",r.Form)
 		store.Save()
 
 		w.Header().Set("Location", "/login")
@@ -89,6 +94,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Info(fmt.Sprintf("loginHandler enter, Request:%v",r))
 	store, err := session.Start(nil, w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -96,6 +102,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
+		logger.Info("loginHandler post")
 		store.Set("LoggedInUserID", constants.UserID)
 		store.Save()
 
@@ -108,6 +115,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Info(fmt.Sprintf("authHandler enter, Request:%v",r))
 	store, err := session.Start(nil, w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -115,12 +123,14 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, ok := store.Get("LoggedInUserID"); !ok {
+		logger.Error("authHandler, LoggedInUserID not found, will re login.")
 		w.Header().Set("Location", "/login")
 		w.WriteHeader(http.StatusFound)
 		return
 	}
 
 	if r.Method == "POST" {
+		logger.Error("authHandler, post.")
 		var form url.Values
 		if v, ok := store.Get("ReturnUri"); ok {
 			form = v.(url.Values)
