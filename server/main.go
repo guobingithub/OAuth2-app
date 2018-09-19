@@ -80,6 +80,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		}
 		store.Set("ReturnUri", r.Form)
 		logger.Info("userAuthorizeHandler, ReturnUri:",r.Form)
+		logger.Info("userAuthorizeHandler, has no userId, will login.")
 		store.Save()
 
 		w.Header().Set("Location", "/login")
