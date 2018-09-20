@@ -46,6 +46,29 @@ func main() {
 
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/auth", authHandler)
+	http.HandleFunc("/auser",func(w http.ResponseWriter, r *http.Request) {
+		logger.Info(fmt.Sprintf("auser Handler enter, Request:%v",r))
+		//exp,err := srv.AccessTokenExpHandler(w, r)
+		//if err != nil {
+		//	logger.Error(fmt.Sprintf("auser Handler, AccessTokenExpHandler err:%v",err))
+		//	http.Error(w, err.Error(), http.StatusBadRequest)
+		//}
+		//
+		//logger.Error(fmt.Sprintf("auser Handler, exp:%v",exp))
+
+		r.ParseForm()
+		accessToken := r.Form.Get("access_token")
+		logger.Error("auser Handler, request form access_token:",accessToken)
+		ti,err := srv.Manager.LoadAccessToken(accessToken)
+		if err!=nil{
+			logger.Error(fmt.Sprintf("auser Handler, accessToken fail! err:%v",err))
+			return
+		}
+		logger.Error(fmt.Sprintf("auser Handler, accessToken ok! ti:%v",ti))
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("hello guoBin@."))
+	})
 
 	http.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
 		logger.Info(fmt.Sprintf("authorize Handler enter, Request:%v",r))
@@ -63,6 +86,7 @@ func main() {
 			logger.Error(fmt.Sprintf("token Handler, HandleTokenRequest err:%v",err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		logger.Error(fmt.Sprintf("token Handler, HandleTokenRequest ok, w:%v\n, r:%v",w,r))
 	})
 
 	logger.Info("Server is running at 9000 port.")
@@ -175,4 +199,11 @@ func showHTML(w http.ResponseWriter, req *http.Request, filename string) {
 	defer file.Close()
 	fi, _ := file.Stat()
 	http.ServeContent(w, req, file.Name(), fi.ModTime(), file)
+}
+
+func userInfoHandler(w http.ResponseWriter, r *http.Request){
+	logger.Info(fmt.Sprintf("userInfoHandler enter, Request:%v",r))
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("hello guoBin."))
 }

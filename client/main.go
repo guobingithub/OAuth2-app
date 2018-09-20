@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	//"encoding/json"
 	"OAuth2-demo/logger"
 	"net/http"
 	"OAuth2-demo/constants"
 
 	"golang.org/x/oauth2"
 	"fmt"
+	//"io/ioutil"
+	"io/ioutil"
 )
 
 var (
@@ -61,12 +63,17 @@ func callBackHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	ex := make(map[string]interface{})
-	ex["words"] = "Hello callback!"
-	token.WithExtra(ex)
-	e := json.NewEncoder(w)
-	e.SetIndent("", "  ")
-	e.Encode(*token)
+	response, err := http.Get("http://localhost:9000/auser?access_token=" + token.AccessToken)
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	fmt.Fprintf(w, "111111111111111:%s\n", contents)
 
-	logger.Info(fmt.Sprintf("callBackHandler ok, tokenInfo:%v\n",token))
+	//ex := make(map[string]interface{})
+	//ex["words"] = "Hello callback!"
+	//token.WithExtra(ex)
+	//e := json.NewEncoder(w)
+	//e.SetIndent("", "  ")
+	//e.Encode(*token)
+	//
+	//logger.Info(fmt.Sprintf("callBackHandler ok, tokenInfo:%v\n",token))
 }
