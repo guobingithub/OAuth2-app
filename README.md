@@ -16,11 +16,13 @@ OAuth（开放授权）是一个开放标准，允许用户让第三方应用访
 3、客户端，要访问服务提供方资源的第三方应用，通常是网站，如提供照片打印服务的网站。在认证过程之前，客户端要向服务提供者申请客户端标识。
 
 使用OAuth进行认证和授权的主要过程如下图：
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/2.png) 
 
 上面的client就是第三方网站，Resource Server资源服务器，Authorization Server授权服务器。其中资源服务器和授权服务器可以是同一个。
 Access Token每个Client有一个并且有时效性。
 
 3.几种授权模式
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/3.png) 
 
 1、授权码模式，是功能最完整、流程最严密的授权模式。
 2、简化模式，不通过第三方应用的服务器，直接在浏览器中向认证服务器申请令牌，跳过了“授权码”这个步骤。
@@ -34,19 +36,16 @@ Access Token每个Client有一个并且有时效性。
 
 2.网页上操作流程：
 A. 首先输入localhost:9001/login地址，请求客户端的服务：
-
-
-
-
-
-
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/5.png) 
 
 B. 请求上述服务之后，会重定向到服务端去认证，认证会经历 登录 - 授权 的流程。服务端登录，页面如下：
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/6.png) 
 
 C. 服务端授权，页面如下：
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/7.png) 
 
 D.点击授权进行授权之后，服务端会生成授权码code，并重定向到客户端的callback页面。callback过程中客户端会拿着这个code去发送POST请求给服务端，申请access_token等信息。
-
+![介绍](https://github.com/guobingithub/OAuth2-app/blob/master/image/8.png) 
 
 客户端拿到access_token信息之后，可以凭借它在特定的时间内，去访问资源服务器的特定资源。
 
