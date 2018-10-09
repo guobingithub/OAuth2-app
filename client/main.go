@@ -35,8 +35,11 @@ func main() {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request){
+	//s, _ := ioutil.ReadAll(r.Body) //把  body 内容读入字符串 s
+	//fmt.Fprintf(w, "jjjjjjj:%s", s)        //在返回页面中显示内容。
 	logger.Info(fmt.Sprintf("client loginHandler enter, Request:%v",r))
 	u := config.AuthCodeURL(constants.AuthState)
+	logger.Error("jjjjjjj:", u)
 	http.Redirect(w, r, u, http.StatusFound)
 }
 

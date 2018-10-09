@@ -34,6 +34,7 @@ func main() {
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
 	srv.SetAccessTokenExpHandler(accessTokenExpHandler)
 	srv.SetAuthorizeScopeHandler(authorizeScopeHandler)
+	srv.SetPasswordAuthorizationHandler(passwordAuthorizationHandler)
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
 		logger.Error("Internal Error:", err.Error())
@@ -65,6 +66,8 @@ func main() {
 			return
 		}
 		logger.Error(fmt.Sprintf("auser Handler, accessToken ok! ti:%v",ti))
+		logger.Error("auser Handler, accessToken ok! userId:",ti.GetUserID())
+		logger.Error("auser Handler, accessToken ok! access_token:",ti.GetAccess())
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("hello guoBin@."))
@@ -122,12 +125,21 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 
 func accessTokenExpHandler(w http.ResponseWriter, r *http.Request) (exp time.Duration, err error){
 	logger.Info(fmt.Sprintf("accessTokenExpHandler enter, Request:%v",r))
-	return 20 * time.Second, nil
+	return 120 * time.Second, nil
 }
 
 func authorizeScopeHandler(w http.ResponseWriter, r *http.Request) (scope string, err error){
 	logger.Info(fmt.Sprintf("authorizeScopeHandler enter, Request:%v",r))
 	return "user", nil
+}
+
+func passwordAuthorizationHandler(username, password string) (userID string, err error){
+	if username == "admin" && password == "123456" {
+		userID = "000000"
+		return
+	}
+	err = fmt.Errorf("user not found")
+	return
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,9 +150,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Error("1111111111111111111111111")
+	sid := store.SessionID()
+	logger.Error("sssssssssssssssssssssid:",sid)
 	if r.Method == "POST" {
+		if r.Form == nil {
+			r.ParseForm()
+		}
+		logger.Error("login user:",r.Form.Get("user"))
+
 		logger.Info("loginHandler post")
-		store.Set("LoggedInUserID", constants.UserID)
+		store.Set("LoggedInUserID", r.Form.Get("user"))
 		store.Save()
 
 		w.Header().Set("Location", "/auth")
@@ -176,6 +196,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 		u.Path = "/authorize"
 		u.RawQuery = form.Encode()
 		w.Header().Set("Location", u.String())
+		logger.Error("uuuuuuuuuuuu Location:",u.String())
 		w.WriteHeader(http.StatusFound)
 		store.Delete("Form")
 
