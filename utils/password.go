@@ -11,6 +11,7 @@ import (
 	mt "math/rand"
 	"strconv"
 	"strings"
+	"fmt"
 )
 
 const (
@@ -143,4 +144,10 @@ func salt_secret() (string, error) {
 
 func randInt(min int, max int) int {
 	return min + mt.Intn(max-min)
+}
+
+func Md5(str string) string {
+	hash := md5.New()
+	hash.Write([]byte(str) )
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
