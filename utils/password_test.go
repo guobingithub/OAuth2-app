@@ -45,6 +45,9 @@ func TestMd5(t *testing.T) {
 	}else {
 		logger.Info("校验密码是否有效, 密码正确!")
 	}
+
+	pwdReSecret := Md5(Md5(passwd))
+	logger.Info("Md5二次加密成功, 密码:",pwdReSecret)
 }
 
 func TestM(t *testing.T) {

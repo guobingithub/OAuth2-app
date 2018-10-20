@@ -148,6 +148,7 @@ func randInt(min int, max int) int {
 
 func Md5(str string) string {
 	hash := md5.New()
-	hash.Write([]byte(str) )
+	hash.Write([]byte(str))
+	hash.Write([]byte(salt_local_secret))
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
