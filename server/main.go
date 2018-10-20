@@ -171,6 +171,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	showHTML(w, r, LoginPath)
 }
 
+func hello(w http.ResponseWriter, r *http.Request) {
+	r.Header.Get("sid")
+
+
+}
+
 func authHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info(fmt.Sprintf("authHandler enter, Request:%v",r))
 	store, err := session.Start(nil, w, r)
